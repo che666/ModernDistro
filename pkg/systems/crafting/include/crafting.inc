@@ -143,7 +143,8 @@ function CreateCraftItem(byref who, byref craft_skill, use_on, use_onobjtype, ob
 
 	SendSysMessageCL(who, 1077561, color := 66); // You begin working.
 	playCraftWork(who, craft_skill, CRAFT_CYCLE_SUCCESS);
-	var theitem := CreateItemInBackpack(who, objtype, 1);
+	var theitem := GetItemDescriptor(CInt(objtype));
+	//var theitem := CreateItemInBackpack(who, objtype, 1);
 	var elem := FindConfigElem(resource_config, use_onobjtype);
 	if( theitem )
 		var nme := (resource_config[use_onobjtype].Name)+" "+itemname;
@@ -211,6 +212,7 @@ function CreateCraftItem(byref who, byref craft_skill, use_on, use_onobjtype, ob
 				SendSysMessageCL( who, 1044155, color := 66 ); // You create an exceptional quality item.
 			endif
 		else
+			Broadcast("WE ARE HERE!");
 			var rint := randomint(AP_GetSkill(who, craft_skill));
 			if(reqd >= 23)
 				reqd := reqd - 20;
@@ -237,6 +239,7 @@ function CreateCraftItem(byref who, byref craft_skill, use_on, use_onobjtype, ob
 				theitem.hp := theitem.maxhp;
 			endif
 			var word := "";
+
 			if((nme[1] == "a") || (nme[1] == "e") || (nme[1] == "i") || (nme[1] == "o") || (nme[1] == "u"))
 				word := "an ";
 			else
@@ -244,6 +247,7 @@ function CreateCraftItem(byref who, byref craft_skill, use_on, use_onobjtype, ob
 			endif
 			nme := ""+word + nme;
 			nme := nme - "plain ";
+
 		endif
 		SetName(theitem, nme);
 		if( theitem.isA(POLCLASS_CONTAINER) )
@@ -266,10 +270,14 @@ function CreateCraftItem(byref who, byref craft_skill, use_on, use_onobjtype, ob
 		//		theitem.unequipscript := "unequipweapon";
 			endif
 		endif
-	else
+	endif
+
+       	var item := CreateItemInBackpack(who, theitem, 1);
+	if (!item)
 		SendSysMessageCL( who, 502868, color := 33 ); // Your backpack is too full.
 		return 0;
 	endif
+	//endif
 
 	return theitem;
 
